@@ -4,7 +4,9 @@ import os
 import sys
 import json
 import re
-from kubernetes import config
+import base64
+from kubernetes import config, client
+from kubernetes.client.rest import ApiException
 import logging
 import MySQLdb
 import logging.handlers
@@ -31,12 +33,12 @@ def create_logger(log_level):
     '''
     json_format = logging.Formatter('{"time":"%(asctime)s", "level":"%(levelname)s", "resource_name":"%(resource_name)s", "message":"%(message)s"}')
     filter = K8sLoggingFilter()
-    logger = logging.getLogger()
+    logger = logging.getLogger("mysql-controller")
     stdout_handler = logging.StreamHandler()
     stdout_handler.setLevel(logging.DEBUG)
     stdout_handler.setFormatter(json_format)
-    logger.addHandler(stdout_handler)
     logger.addFilter(filter)
+    logger.addHandler(stdout_handler)
 
     if log_level == 'debug':
         logger.setLevel(logging.DEBUG)
@@ -143,9 +145,20 @@ def process_event(crds, obj, event_type, runtime_config):
     metadata = obj.get('metadata')
     k8s_resource_name = metadata.get('name')
 
-    logger = logging.LoggerAdapter(logging.getLogger(), {'resource_name': k8s_resource_name})
+    logger = logging.LoggerAdapter(logging.getLogger("mysql-controller"), {'resource_name': k8s_resource_name})
 
     logger.debug('Processing event {0}: {1}'.format(event_type, json.dumps(obj, indent=1)))
+
+    v1 = client.CoreV1Api()
+    try:
+        obj = v1.read_namespaced_secret(spec['dbUserPassword']['name'], metadata.get('namespace'))
+        sec = str(obj.data.get(spec['dbUserPassword']['key']))
+        pas = base64.b64decode(sec.strip())
+        spec['dbUserPassword'] = pas.decode('utf-8')
+    except ApiException as e:
+        logger.warning('Password secret could not be found: {0} in {1}'.format(spec['dbUserPassword']['name'], metadata.get('namespace')))
+#         logger.debug("Exception when calling CoreV1Api->read_namespaced_secret: {0}".format(e))
+        return
 
     if event_type == 'MODIFIED':
         logger.debug('Ignoring modification for DB {0}, not supported'.format(spec['dbName']))
@@ -217,7 +230,7 @@ def process_event(crds, obj, event_type, runtime_config):
         else:
             logger.info('User {0} already exists'.format(spec['dbUserName']))
 
-        cur.execute("GRANT ALL ON {0}.* TO '{1}';".format(permissions, spec['dbName'], spec['dbUserName']))
+        cur.execute("GRANT ALL ON {0}.* TO '{1}';".format(spec['dbName'], spec['dbUserName']))
 
         if ('extraSQL' in spec) and not db_created:
             logger.info('Ingoring extra SQL commands dbName {0} as it is already created'.format(spec['dbName']))

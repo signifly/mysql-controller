@@ -38,7 +38,12 @@ spec:
                 dbUserName:
                   type: string
                 dbUserPassword:
-                  type: string
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    key:
+                      type: string
                 dbInstanceId:
                   type: string
                 extraSQL:

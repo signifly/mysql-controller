@@ -6,7 +6,9 @@ metadata:
 spec:
   dbName: db1
   dbUserName: user1
-  dbUserPassword: swordfish
+  dbUserPassword:
+    name: mySecret
+    key: myKey
   # This string must correspond to a key in one of `mysql_instances` in the config file
   dbInstanceId: default
 ---
@@ -17,6 +19,8 @@ metadata:
 spec:
   dbName: db2
   dbUserName: user2
-  dbUserPassword: swordfish
+  dbUserPassword:
+    name: mySecret
+    key: myKey
   # This string must correspond to a key in one of `mysql_instances` in the config file
   dbInstanceId: instance2

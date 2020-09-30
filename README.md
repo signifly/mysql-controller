@@ -4,9 +4,17 @@
 
 A simple k8s controller to create MySQL databases. Once you install the controller and point it at your existing MySQL database instance, you can create `MysqlDatabase` resource in k8s and the controller will create a database in your MySQL instance, create a user that with access to this database and optionally run extra SQL commands.
 
-Example resource:
+Example resources:
 
 ```yaml
+kind: Secret
+apiVersion: v1
+type: Opaque
+metadata:
+  name: databasePasswords
+data:
+  myFirstPassword: dnBJblBESHpWS212YWhzVA==
+---
 apiVersion: signifly.io/v1
 kind: MysqlDatabase
 metadata:
@@ -14,8 +22,13 @@ metadata:
 spec:
   dbName: db1
   dbRoleName: user1
-  dbRolePassword: swordfish
+  dbRolePassword:
+    name: databasePasswords
+    key: myFirstPassword
 ```
+
+The controller will look up the secret within the same namespace as the `MysqlDatabase` resource.
+
 
 Pull requests welcome.
 

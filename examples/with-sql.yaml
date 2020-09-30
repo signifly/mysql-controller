@@ -5,7 +5,9 @@ metadata:
 spec:
   dbName: db5
   dbUserName: user5
-  dbUserPassword: swordfish
+  dbUserPassword:
+    name: mySecret
+    key: myKey
   extraSQL: |
     CREATE TABLE example (
       user_id serial PRIMARY KEY,

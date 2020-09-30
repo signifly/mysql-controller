@@ -5,7 +5,9 @@ metadata:
 spec:
   dbName: db3
   dbUserName: user3
-  dbUserPassword: swordfish
+  dbUserPassword:
+    name: databases
+    key: myKey
   onDeletion:
     # Whether to drop the databse when the resource is deleted
     dropDB: false
