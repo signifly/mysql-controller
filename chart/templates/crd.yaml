@@ -13,42 +13,48 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   group: signifly.io
-{{- if semverCompare ">=1.11" .Capabilities.KubeVersion.GitVersion }}
   versions:
     - name: v1
       served: true
       storage: true
-{{- else }}
-  version: v1
-{{- end }}
+      additionalPrinterColumns:
+        - name: DBNAME
+          type: string
+          description: The name of the database
+          jsonPath: .spec.dbName
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - dbName
+                - dbUserName
+                - dbUserPassword
+              properties:
+                dbName:
+                  type: string
+                dbUserName:
+                  type: string
+                dbUserPassword:
+                  type: string
+                dbInstanceId:
+                  type: string
+                extraSQL:
+                  type: string
+                onDeletion:
+                  type: object
+                  properties:
+                    dropDB:
+                      type: boolean
+                    dropUser:
+                      type: boolean
   scope: Namespaced
   names:
     plural: mysqldatabases
     singular: mysqldatabase
-    kind: MySQLDatabase
+    kind: MysqlDatabase
     shortNames:
-    - mydb
-  additionalPrinterColumns:
-  - name: DBNAME
-    type: string
-    description: The name of the database
-    JSONPath: .spec.dbName
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          required:
-          - dbName
-          - dbUserName
-          - dbUserPassword
-          properties:
-            dbName:
-              type: string
-            dbUserName:
-              type: string
-            dbUserPassword:
-              type: string
-            dbInstanceId:
-              type: string
-            extraSQL:
-              type: string
+    - mysqldb
+

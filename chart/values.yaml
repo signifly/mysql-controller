@@ -14,7 +14,7 @@ replicaCount: 1
 
 image:
   repository: signifly/mysql-controller
-  tag: 0.5
+  tag: 0.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""

@@ -24,14 +24,14 @@ Pull requests welcome.
 Use the included [Helm](https://helm.sh/) chart and set the host, username and password for your default MySQL instance:
 
 ```
-helm install ./chart --set config.postgres_instances.default.host=my-rds-instance.rds.amazonaws.com --set config.postgres_instances.default.user=root --set config.postgres_instances.default.password=admin_password
+helm upgrade --install mysql-controller ./chart --set config.mysql_instances.default.host=my-rds-instance.rds.amazonaws.com --set config.mysql_instances.default.user=root --set config.mysql_instances.default.password=admin_password
 ```
 
 Or use the docker image: [signifly/mysql-controller](https://hub.docker.com/r/signifly/mysql-controller)
 
 ### Examples
 
-See [examples](examples) to for how to add extensions, extra SQL commands and also how to drop databases when the k8s resource is deleted.
+See [examples](examples) to for how to run extra SQL commands and also how to drop databases when the k8s resource is deleted.
 
 See [example-config.yaml](example-config.yaml) for example chart values file.
 
@@ -40,7 +40,7 @@ See [example-config.yaml](example-config.yaml) for example chart values file.
 To test locally, start a postgres container:
 
 ```
-docker run -d -p 127.0.0.1:3306:3306 -e MYSQL_ROOT_PASSWORD=mysql mysql:8.0
+docker run -d -p 127.0.0.1:3306:3306 -e MYSQL_ROOT_PASSWORD=mysql -e MYSQL_ROOT_HOST="%" mysql:8.0
 ```
 
 Start the controller, it will use your default kubectl configuration/context:

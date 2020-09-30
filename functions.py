@@ -86,8 +86,6 @@ class MysqlControllerConfig(object):
                 creds = data.copy()
                 creds['passwd'] = creds['password']
                 del creds['password']
-                if 'dbname' not in creds:
-                    creds['dbname'] = 'mysql'
                 break
 
         return creds
@@ -162,9 +160,10 @@ def process_event(crds, obj, event_type, runtime_config):
     try:
         conn = MySQLdb.connect(**db_credentials)
         cur = conn.cursor()
-        conn.set_session(autocommit=True)
+        conn.autocommit(True)
     except Exception as e:
         logger.error('Error when connecting to DB instance {0}: {1}'.format(spec.get('dbInstanceId'), e))
+        logger.debug('Connection details: {0}'.format(db_credentials))
         return
 
 
@@ -218,8 +217,7 @@ def process_event(crds, obj, event_type, runtime_config):
         else:
             logger.info('User {0} already exists'.format(spec['dbUserName']))
 
-        cur.execute("GRANT ALL PRIVILEGES ON {0}.* TO '{1}'@'%';".format(spec['dbUserName'], spec['dbName']))
-        cur.execute("FLUSH PRIVILEGES;")
+        cur.execute("GRANT ALL ON {0}.* TO '{1}';".format(permissions, spec['dbName'], spec['dbUserName']))
 
         if ('extraSQL' in spec) and not db_created:
             logger.info('Ingoring extra SQL commands dbName {0} as it is already created'.format(spec['dbName']))
@@ -244,7 +242,7 @@ def process_event(crds, obj, event_type, runtime_config):
             if 'extraSQL' in spec:
                 db_conn = MySQLdb.connect(**user_credentials)
                 db_cur = db_conn.cursor()
-                db_conn.set_session(autocommit=False)
+                db_conn.autocommit(false)
                 logger.info('Running extra SQL commands for in dbName {0}'.format(spec['dbName']))
                 try:
                     db_cur.execute(spec['extraSQL'])
