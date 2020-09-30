@@ -1,0 +1,3 @@
+To verify that the mysql-controller pods have started, run:
+
+  kubectl --namespace={{ .Release.Namespace }} get pods -l "app={{ template "mysql-controller.name" . }},release={{ .Release.Name }}"

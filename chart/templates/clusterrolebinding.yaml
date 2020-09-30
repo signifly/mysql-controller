@@ -1,0 +1,23 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: {{ template "mysql-controller.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ include "mysql-controller.name" . }}
+    helm.sh/chart: {{ include "mysql-controller.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  name: {{ template "mysql-controller.fullname" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "mysql-controller.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "mysql-controller.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end -}}

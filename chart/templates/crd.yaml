@@ -1,0 +1,54 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: mysqldatabases.signifly.io
+  labels:
+    app: {{ template "mysql-controller.name" . }}
+    chart: {{ template "mysql-controller.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ include "mysql-controller.name" . }}
+    helm.sh/chart: {{ include "mysql-controller.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  group: signifly.io
+{{- if semverCompare ">=1.11" .Capabilities.KubeVersion.GitVersion }}
+  versions:
+    - name: v1
+      served: true
+      storage: true
+{{- else }}
+  version: v1
+{{- end }}
+  scope: Namespaced
+  names:
+    plural: mysqldatabases
+    singular: mysqldatabase
+    kind: MySQLDatabase
+    shortNames:
+    - mydb
+  additionalPrinterColumns:
+  - name: DBNAME
+    type: string
+    description: The name of the database
+    JSONPath: .spec.dbName
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          required:
+          - dbName
+          - dbUserName
+          - dbUserPassword
+          properties:
+            dbName:
+              type: string
+            dbUserName:
+              type: string
+            dbUserPassword:
+              type: string
+            dbInstanceId:
+              type: string
+            extraSQL:
+              type: string

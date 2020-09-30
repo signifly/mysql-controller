@@ -1,0 +1,13 @@
+apiVersion: signifly.io/v1
+kind: MysqlDatabase
+metadata:
+  name: app3
+spec:
+  dbName: db3
+  dbRoleName: user3
+  dbRolePassword: swordfish
+  onDeletion:
+    # Whether to drop the databse when the resource is deleted
+    dropDB: false
+    # Whether to drop the role when the resource is deleted
+    dropRole: false

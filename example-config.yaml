@@ -1,0 +1,12 @@
+# Example config file for controller
+mysql_instances:
+  default:
+    host: localhost
+    user: mysql
+    password: mysql
+    port: 3306
+  instance2:
+    host: localhost
+    user: mysql
+    password: mysql
+    port: 3306

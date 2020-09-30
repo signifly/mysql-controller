@@ -1,0 +1,15 @@
+apiVersion: signifly.io/v1
+kind: MysqlDatabase
+metadata:
+  name: app5
+spec:
+  dbName: db5
+  dbRoleName: user5
+  dbRolePassword: swordfish
+  extraSQL: |
+    CREATE TABLE example (
+      user_id serial PRIMARY KEY,
+      username VARCHAR (50) UNIQUE NOT NULL,
+      email VARCHAR (355) UNIQUE NOT NULL
+    );
+    INSERT INTO example (user_id, username, email) VALUES (1, 'user1', 'user1@email.com');
