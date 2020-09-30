@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import os
 import sys
 import json
@@ -12,10 +11,6 @@ import MySQLdb
 import logging.handlers
 import argparse
 import yaml
-
-
-logger = logging.getLogger()
-
 
 class K8sLoggingFilter(logging.Filter):
     '''
@@ -86,7 +81,10 @@ class MysqlControllerConfig(object):
         for id, data in self.yaml_config['mysql_instances'].items():
             if id == instance_id:
                 creds = data.copy()
-                creds['passwd'] = creds['password']
+                creds['passwd'] = get_password(creds['password']['name'], creds['password']['key'], os.environ.get('CURRENT_NAMESPACE', 'default'))
+                if (creds['passwd'] == None):
+                    logging.getLogger("mysql-controller").error("No password found for instance {0}".format(id))
+
                 del creds['password']
                 break
 
@@ -136,6 +134,20 @@ def create_user_not_exists(cur, user_name, user_password):
     else:
         return False
 
+def get_password(name, key, namespace):
+    logger = logging.getLogger("mysql-controller")
+    v1 = client.CoreV1Api()
+    try:
+        obj = v1.read_namespaced_secret(name, namespace)
+        sec = str(obj.data.get(key))
+        pas = base64.b64decode(sec.strip())
+        return pas.decode('utf-8')
+    except ApiException as e:
+        if e.status == 404:
+            logger.warning('Password secret could not be found: {0} in {1}'.format(name, namespace))
+        else:
+            logger.error("Exception when calling CoreV1Api->read_namespaced_secret: {0}".format(e))
+        return None
 
 def process_event(crds, obj, event_type, runtime_config):
     '''
@@ -149,16 +161,11 @@ def process_event(crds, obj, event_type, runtime_config):
 
     logger.debug('Processing event {0}: {1}'.format(event_type, json.dumps(obj, indent=1)))
 
-    v1 = client.CoreV1Api()
-    try:
-        obj = v1.read_namespaced_secret(spec['dbUserPassword']['name'], metadata.get('namespace'))
-        sec = str(obj.data.get(spec['dbUserPassword']['key']))
-        pas = base64.b64decode(sec.strip())
-        spec['dbUserPassword'] = pas.decode('utf-8')
-    except ApiException as e:
-        logger.warning('Password secret could not be found: {0} in {1}'.format(spec['dbUserPassword']['name'], metadata.get('namespace')))
-#         logger.debug("Exception when calling CoreV1Api->read_namespaced_secret: {0}".format(e))
+    pas = get_password(spec['dbUserPassword']['name'], spec['dbUserPassword']['key'], metadata.get('namespace'))
+    if (pas == None):
         return
+
+    spec['dbUserPassword'] = pas
 
     if event_type == 'MODIFIED':
         logger.debug('Ignoring modification for DB {0}, not supported'.format(spec['dbName']))

@@ -3,10 +3,14 @@ mysql_instances:
   default:
     host: 127.0.0.1
     user: root
-    password: mysql
+    password:
+      name: passwordSecrets
+      key: mysql
     port: 3306
   instance2:
     host: 127.0.0.1
     user: root
-    password: mysql
+    password:
+      name: passwordSecrets
+      key: mysql
     port: 3306
