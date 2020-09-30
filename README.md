@@ -58,3 +58,4 @@ kubectl apply -f examples/simple.yaml
 ## Credits
 
 This controller is a modified version of [postgres-controller](https://github.com/max-rocket-internet/postgres-controller) to work with MySQL instead.
+
