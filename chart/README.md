@@ -6,15 +6,15 @@ This chart is a modified version of [postgres-controller](https://github.com/max
 
 ## TL;DR;
 
-You will need to set at least 3 parameters when installing. These options set the default database hostname, username and password:
+You will need to set at least 4 parameters when installing. These options set the default database hostname, username and password:
 
 ```console
-$ helm install --name my-release ./chart --set config.mysql_instances.default.host=my-rds-instance.rds.amazonaws.com --set config.mysql_instances.default.user=root --set config.mysql_instances.default.password=swordfish
+$ helm install --name my-release ./chart --set config.mysql_instances.default.host=my-rds-instance.rds.amazonaws.com --set config.mysql_instances.default.user=root --set config.mysql_instances.default.password.name=mysecret --set config.mysql_instances.default.password.key=mykey
 ```
 
 ## Prerequisites
 
-- Kubernetes 1.8+
+- Kubernetes 1.15+
 
 ## Uninstalling the Chart
 
@@ -44,5 +44,5 @@ The following table lists the configurable parameters for this chart and their d
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install` or provide a YAML file containing the values for the above parameters:
 
 ```console
-$ helm install --name my-release ./chart --values my-values.yaml
+$ helm upgrade --install my-release ./chart -f my-values.yaml
 ```
