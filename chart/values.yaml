@@ -1,11 +1,15 @@
 # Controller configuration
-# Contains list of MySQL instances. Should have at least a `default` instance
+# Contains list of MySQL instances. Fallsback to `default` instance if `MysqlDatabase` CRD doesnt specify the instance explicitly
 config:
   mysql_instances:
     # default:
       # host: ""
       # user: ""
-      # password: ""
+      # password:
+        # name of the secret that holds the password for the connection. must be in the same namespace as this chart is deployed to
+        # name: ""
+        # key of the secret
+        # key: ""
       # port: 5432
 
 log_level: 'info'
