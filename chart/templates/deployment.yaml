@@ -40,9 +40,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: CURRENT_NAMESPACE
-                valueFrom:
-                  fieldRef:
-                    fieldPath: metadata.namespace
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: CONFIG_FILE
               value: "/config/mysql-controller.yaml"
             - name: LOG_LEVEL

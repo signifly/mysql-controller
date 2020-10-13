@@ -1,7 +1,7 @@
 # Controller configuration
 # Contains list of MySQL instances. Fallsback to `default` instance if `MysqlDatabase` CRD doesnt specify the instance explicitly
 config:
-  mysql_instances:
+  mysql_instances: {}
     # default:
       # host: ""
       # user: ""
