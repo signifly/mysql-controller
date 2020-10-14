@@ -141,7 +141,7 @@ def get_password(name, key, namespace):
         obj = v1.read_namespaced_secret(name, namespace)
         sec = str(obj.data.get(key))
         pas = base64.b64decode(sec.strip())
-        return pas.decode('utf-8')
+        return pas.decode('utf-8').strip()
     except ApiException as e:
         if e.status == 404:
             logger.warning('Password secret could not be found: {0} in {1}'.format(name, namespace))
