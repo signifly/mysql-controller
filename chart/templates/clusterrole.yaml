@@ -16,4 +16,8 @@ rules:
   - apiGroups: ["signifly.io"]
     resources: ["mysqldatabases"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: {{ .Values.secretNames | toJson }}
+    verbs: ["get"]
 {{- end -}}

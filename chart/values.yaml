@@ -24,6 +24,10 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
+# secretNames is a list of secret names to fetch passwords from. This is used to allow RBAC 'get' to the secret name in all namespaces
+secretNames:
+  - databases
+
 resources: {}
 
 nodeSelector: {}
