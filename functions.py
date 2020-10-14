@@ -117,7 +117,7 @@ def create_db_if_not_exists(cur, db_name):
     '''
     cur.execute("SHOW DATABASES LIKE '{}';".format(db_name))
     if not cur.fetchone():
-        cur.execute("CREATE DATABASE {};".format(db_name))
+        cur.execute("CREATE DATABASE '{}';".format(db_name))
         return True
     else:
         return False
@@ -129,7 +129,7 @@ def create_user_not_exists(cur, user_name, user_password):
     '''
     cur.execute("SELECT 1 FROM mysql.user WHERE user = '{}';".format(user_name))
     if not cur.fetchone():
-        cur.execute("CREATE USER {0}@'%' IDENTIFIED BY '{1}';".format(user_name, user_password))
+        cur.execute("CREATE USER '{0}'@'%' IDENTIFIED BY '{1}';".format(user_name, user_password))
         return True
     else:
         return False
@@ -195,7 +195,7 @@ def process_event(crds, obj, event_type, runtime_config):
 
         if drop_db == True:
             try:
-                cur.execute("DROP DATABASE {0};".format(spec['dbName']))
+                cur.execute("DROP DATABASE '{0}';".format(spec['dbName']))
             except MySQLdb.OperationalError as e:
                 logger.error('Dropping of dbName {0} failed: {1}'.format(spec['dbName'], e))
             else:
@@ -210,7 +210,7 @@ def process_event(crds, obj, event_type, runtime_config):
 
         if drop_user == True:
             try:
-                cur.execute("DROP USER {0}@'%';".format(spec['dbUserName']))
+                cur.execute("DROP USER `{0}`@'%';".format(spec['dbUserName']))
                 cur.execute("FLUSH PRIVILEGES;")
             except Exception as e:
                 logger.error('Error when dropping user {0}: {1}'.format(spec['dbUserName'], e))
@@ -237,7 +237,7 @@ def process_event(crds, obj, event_type, runtime_config):
         else:
             logger.info('User {0} already exists'.format(spec['dbUserName']))
 
-        cur.execute("GRANT ALL ON {0}.* TO '{1}';".format(spec['dbName'], spec['dbUserName']))
+        cur.execute("GRANT ALL ON `{0}`.* TO '{1}';".format(spec['dbName'], spec['dbUserName']))
 
         if ('extraSQL' in spec) and not db_created:
             logger.info('Ingoring extra SQL commands dbName {0} as it is already created'.format(spec['dbName']))
